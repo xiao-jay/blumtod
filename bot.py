@@ -480,6 +480,7 @@ async def main():
         async with aiofiles.open(config_file) as r:
             read = await r.read()
             cfg = json.loads(read)
+
             config = Config(
                 interval=cfg.get("interval"),
                 auto_task=cfg.get("auto_task"),
@@ -487,8 +488,8 @@ async def main():
                 auto_claim=cfg.get("auto_claim"),
                 low=int(cfg.get("low", 240)),
                 high=int(cfg.get("high", 250)),
-                add_time_min=int(cfg.get("additional_time", {}).get("min"), 0),
-                add_time_max=int(cfg.get("additional_time", {}).get("max"), 0)
+                add_time_min=int(cfg.get("additional_time", {}).get("min", 0)),
+                add_time_max=int(cfg.get("additional_time", {}).get("max", 0))
             )
         datas, proxies = await get_data(data_file=args.data, proxy_file=args.proxy)
         menu = f"""
