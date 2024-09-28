@@ -1,0 +1,12 @@
+{
+    "interval": 100,
+    "auto_claim": true,
+    "auto_task": false,
+    "auto_game": false,
+    "low": "180",
+    "high": "230",
+    "additional_time": {
+        "min": 3600,
+        "max": 7200
+    }
+}

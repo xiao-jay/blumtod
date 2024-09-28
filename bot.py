@@ -2,6 +2,8 @@ import os
 import re
 import sys
 import json
+import time
+
 import anyio
 import httpx
 import random
@@ -25,7 +27,6 @@ from models import (
 import python_socks
 from httpx_socks import AsyncProxyTransport
 
-
 init(autoreset=True)
 red = Fore.LIGHTRED_EX
 blue = Fore.LIGHTBLUE_EX
@@ -43,12 +44,15 @@ config_file = "config.json"
 
 
 class Config:
-    def __init__(self, auto_task, auto_game, auto_claim, low, high):
+    def __init__(self, interval, auto_task, auto_game, auto_claim, low, high, add_time_min, add_time_max):
+        self.interval = interval
         self.auto_task = auto_task
         self.auto_game = auto_game
         self.auto_claim = auto_claim
         self.low = low
         self.high = high
+        self.add_time_min = add_time_min
+        self.add_time_max = add_time_max
 
 
 class BlumTod:
@@ -477,11 +481,14 @@ async def main():
             read = await r.read()
             cfg = json.loads(read)
             config = Config(
+                interval=cfg.get("interval"),
                 auto_task=cfg.get("auto_task"),
                 auto_game=cfg.get("auto_game"),
                 auto_claim=cfg.get("auto_claim"),
                 low=int(cfg.get("low", 240)),
                 high=int(cfg.get("high", 250)),
+                add_time_min=int(cfg.get("additional_time", {}).get("min"), 0),
+                add_time_max=int(cfg.get("additional_time", {}).get("max"), 0)
             )
         datas, proxies = await get_data(data_file=args.data, proxy_file=args.proxy)
         menu = f"""
@@ -569,10 +576,11 @@ async def main():
                     res = await BlumTod(
                         id=no, query=data, proxies=proxies, config=config
                     ).start()
+                    await countdown(cfg.interval)
                     result.append(res)
                 end = int(datetime.now().timestamp())
                 total = min(result) - end
-                await countdown(total)
+                await countdown(total+random.randint(cfg.add_time_min, cfg.add_time_max))
 
 
 if __name__ == "__main__":
