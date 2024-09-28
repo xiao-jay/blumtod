@@ -482,7 +482,7 @@ async def main():
             cfg = json.loads(read)
 
             config = Config(
-                interval=cfg.get("interval"),
+                interval=cfg.get("interval",0),
                 auto_task=cfg.get("auto_task"),
                 auto_game=cfg.get("auto_game"),
                 auto_claim=cfg.get("auto_claim"),
@@ -491,6 +491,7 @@ async def main():
                 add_time_min=int(cfg.get("additional_time", {}).get("min", 0)),
                 add_time_max=int(cfg.get("additional_time", {}).get("max", 0))
             )
+            print(config)
         datas, proxies = await get_data(data_file=args.data, proxy_file=args.proxy)
         menu = f"""
 {white}data file :{green} {args.data}
@@ -577,11 +578,11 @@ async def main():
                     res = await BlumTod(
                         id=no, query=data, proxies=proxies, config=config
                     ).start()
-                    await countdown(cfg.interval)
+                    await countdown(config.interval)
                     result.append(res)
                 end = int(datetime.now().timestamp())
                 total = min(result) - end
-                await countdown(total+random.randint(cfg.add_time_min, cfg.add_time_max))
+                await countdown(total+random.randint(config.add_time_min, config.add_time_max))
 
 
 if __name__ == "__main__":
